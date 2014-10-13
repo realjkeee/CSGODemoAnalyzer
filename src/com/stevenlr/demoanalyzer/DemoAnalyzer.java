@@ -131,12 +131,39 @@ public class DemoAnalyzer {
 				if(line.equalsIgnoreCase("round_start")) {
 					match.nextRound();
 				}
+				else if(line.equalsIgnoreCase("round_end")) {
+					parseRoundEnd(br);
+				}
 				else if(line.equalsIgnoreCase("player_death")) {
 					parsePlayerDeath(br);
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	private void parseRoundEnd(BufferedReader br) {
+		String line;
+		int winTeam = -1;
+		
+		try {
+			while((line = br.readLine()) != null) {
+				if(line.equalsIgnoreCase("}"))
+					break;
+				
+				line = line.trim();
+				
+				if(line.startsWith("winner")) {
+					winTeam = Integer.parseInt(line.substring(line.indexOf(':') + 1).trim());
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		if(winTeam != -1) {
+			match.setWinTeam(winTeam);
 		}
 	}
 

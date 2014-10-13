@@ -7,10 +7,16 @@ public class Match {
 	
 	private Map<Integer, Player> players;
 	private int currentRound;
+	private int[] winTeam;
 	
 	public Match() {
 		currentRound = -1;
 		players = new HashMap<Integer, Player>();
+		winTeam = new int[30];
+		
+		for(int i = 0; i < 30; i++) {
+			winTeam[i] = -1;
+		}
 	}
 	
 	public void setPlayer(int id, String name, int team) {
@@ -47,5 +53,9 @@ public class Match {
 		}
 		
 		return alivePlayers;
+	}
+
+	public void setWinTeam(int winTeam) {
+		this.winTeam[currentRound] = winTeam;
 	}
 }

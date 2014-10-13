@@ -2,6 +2,7 @@ package com.stevenlr.demoanalyzer;
 
 public class Player {
 	
+	@SuppressWarnings("unused")
 	private int id;
 	private String name;
 	private PlayerRound[] rounds;

@@ -1,5 +1,6 @@
 package com.stevenlr.demoanalyzer;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,14 +49,23 @@ public class Match {
 		Object[] plist = players.values().toArray();
 		
 		for(int i = 0; i < plist.length; i++) {
-			if(((Player) plist[i]).getTeam() == team)
+			if(((Player) plist[i]).getTeam() == team
+			   && !((Player) plist[i]).getRound(currentRound).getDeath())
 				alivePlayers++;
 		}
 		
 		return alivePlayers;
 	}
+	
+	public Collection<Player> getPlayers() {
+		return players.values();
+	}
 
 	public void setWinTeam(int winTeam) {
 		this.winTeam[currentRound] = winTeam;
+	}
+
+	public int getRoundWinTeam(int i) {
+		return winTeam[i];
 	}
 }

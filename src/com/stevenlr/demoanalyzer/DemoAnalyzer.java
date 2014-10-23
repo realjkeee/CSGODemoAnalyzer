@@ -32,6 +32,9 @@ public class DemoAnalyzer {
 		skipToNextRound(br);
 		match.nextRound();
 		parseMatch(br);
+		
+		OutputXML out = new OutputXML(match);
+		out.write("output.xml");
 	}
 
 	private void parsePlayersInfos(BufferedReader br) {
@@ -190,7 +193,7 @@ public class DemoAnalyzer {
 					String weapon = line.substring(7).trim();
 					
 					if(weapon.equalsIgnoreCase("hegrenade")
-							|| weapon.equalsIgnoreCase("knife")) {
+					   || weapon.equalsIgnoreCase("knife")) {
 						abnormalWeapon = true;
 					}
 				}

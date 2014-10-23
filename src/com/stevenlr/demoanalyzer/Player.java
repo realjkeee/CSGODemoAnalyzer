@@ -39,4 +39,8 @@ public class Player {
 	public String getName() {
 		return name;
 	}
+	
+	public PlayerRound getRound(int id) {
+		return rounds[id];
+	}
 }

@@ -43,4 +43,8 @@ public class PlayerRound {
 	public int getAbnormalKills() {
 		return killsAbnormal;
 	}
+	
+	public boolean getDeath() {
+		return death;
+	}
 }

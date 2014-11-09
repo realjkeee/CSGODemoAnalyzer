@@ -2,39 +2,109 @@ package com.stevenlr.demoanalyzer;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 
 import com.stevenlr.demoanalyzer.util.Pair;
 
 public class DemoAnalyzer {
 	
 	private Match match;
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+	
+	public static String installDir = "C:\\Program Files (x86)\\Steam\\SteamApps\\common\\Counter-Strike Global Offensive";
+	public static String replaysPath;
+	public static String binPath;
 	
 	public static void main(String args[]) {
-		new DemoAnalyzer("info.txt");
-	}
-	
-	public DemoAnalyzer(String filename) {
-		BufferedReader br;
+		replaysPath = installDir + File.separator + "csgo" + File.separator + "replays";
+		binPath = installDir + File.separator + "bin";
 		
-		try {
-			br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(filename))));
-		} catch(Exception e) {
-			e.printStackTrace();
-			return;
+		if (!(new File("matchs").isDirectory())) {
+			new File("matchs").mkdir();
 		}
 		
-		match = new Match();
+		File directory = new File(replaysPath);
+		
+		List<File> files = Arrays.asList(directory.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.endsWith(".dem");
+			}
+		}));
+		
+		Collections.sort(files, new Comparator<File>() {
+			@Override
+			public int compare(File arg0, File arg1) {
+				return new Long(arg0.lastModified()).compareTo(arg1.lastModified());
+			}
+		});
+		
+		for (int i = 0; i < files.size(); ++i) {
+			File f = files.get(i);
+			new DemoAnalyzer(files.get(i));
+			System.out.println((i + 1) + "/" + files.size());
+		}
+	}
+	
+	public DemoAnalyzer(File f) {
+		String matchId = f.getName().substring(0, f.getName().length() - 4);
+		String date = makeDate(f);
+		
+		Runtime r = Runtime.getRuntime();
+		BufferedReader br = null;
+		Process p = null;
+		
+		try {
+			p = r.exec("\"" + binPath + File.separator + "demoinfogo\" -gameevents -nofootsteps \"" + replaysPath + File.separator + f.getName() + "\"");
+			br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		if (br == null) {
+			System.err.println("Error reading demo file " + f.getName());
+			System.exit(1);
+		}
+		
+		BufferedReader bre = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+		
+		match = new Match(date, matchId);
 		
 		parsePlayersInfos(br);
 		skipToNextRound(br);
 		match.nextRound();
 		parseMatch(br);
 		
-		OutputXML out = new OutputXML(match);
-		out.write("output.xml");
+		try {
+			String line;
+			while ((line = bre.readLine()) != null) {
+				System.out.println(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		if (p.exitValue() == 1) {
+			OutputJSON out = new OutputJSON(match);
+			out.write("matchs" + File.separator + match.getId() + ".js");
+			System.out.print("[ OK ] ");
+		} else {
+			System.out.print("[FAIL] ");
+		}
+		
+		p.destroy();
+	}
+	
+	private String makeDate(File f) {
+		return dateFormat.format(new Date(f.lastModified()));
 	}
 
 	private void parsePlayersInfos(BufferedReader br) {

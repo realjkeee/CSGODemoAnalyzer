@@ -9,8 +9,13 @@ public class Match {
 	private Map<Integer, Player> players;
 	private int currentRound;
 	private int[] winTeam;
+	private String date;
+	private String id;
 	
-	public Match() {
+	public Match(String date, String id) {
+		this.id = id;
+		this.date = date;
+		
 		currentRound = -1;
 		players = new HashMap<Integer, Player>();
 		winTeam = new int[30];
@@ -67,5 +72,13 @@ public class Match {
 
 	public int getRoundWinTeam(int i) {
 		return winTeam[i];
+	}
+	
+	public String getDate() {
+		return date;
+	}
+	
+	public String getId() {
+		return id;
 	}
 }

@@ -82,7 +82,14 @@ public class OutputXML {
 		
 		try {
 			OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(new File(outputFilename)));
-			osw.write(out.toString());
+			osw.write("register_match_data('");
+			
+			String data = out.toString();
+			data.replaceAll("'", "\'");
+			data.replace('\n', '\\');
+			
+			osw.write(data);
+			osw.write("');");
 			osw.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
